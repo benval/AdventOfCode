@@ -13,7 +13,7 @@ public class Day4 {
         System.out.println("Number of words: " + antallX);
     }
 
-    public static char[][] convertToCharArray(String multilineString) {
+    private static char[][] convertToCharArray(String multilineString) {
         String[] lines = multilineString.split("\n");
         int numberOfRows = lines.length;
         int numberOfCols = lines[0].length(); // Assumes all lines are of equal length
