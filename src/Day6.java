@@ -13,7 +13,7 @@ public class Day6 {
         char[][] charGrid = convertToCharArray(inputTask1);
 
         char startingDirection = findStartingDirection(inputTask1);
-        playOutPath(charGrid, startingDirection);
+        playOutPath2(charGrid, startingDirection);
         visitedPositions = countDistinctMoves(charGrid);
 
         System.out.println("Sum of middle numbers from valid orders: " + visitedPositions);
@@ -25,12 +25,9 @@ public class Day6 {
         return matcher.find() ? matcher.group().charAt(0) : ' ';
     }
 
-    private static boolean hasValidMove(String input, char[][] charGrid) {
-        char startingDirection = findStartingDirection(input);
-        return startingDirection != ' ';
-    }
-
     private static char[][] playOutPath2(char[][] grid, char startingDirection) {
+        char[][] previousGridWins = new char[grid.length][grid[0].length];
+
         int rows = grid.length;
         int cols = grid[0].length;
         for (int i = 0; i < rows; i++) {
@@ -38,62 +35,78 @@ public class Day6 {
                 if (grid[i][j] == startingDirection) {
                     while (true) {
                         if (grid[i][j] == '<') {
-                            if (j - 1 < 0) {
-                                grid[i][j] = 'X';
-                                return grid; // finished
-                            }
+//                            if (j - 1 < 0) {
+//                                grid[i][j] = 'X';
+//                                return grid; // finished
+//                            }
 
                             if (grid[i][j - 1] == '.' || grid[i][j - 1] == 'X') {
                                 grid[i][j - 1] = '<';
-                                grid[i][j] = 'X';
+                                grid[i][j] = '-';
                                 j = j - 1;
                             } else if (grid[i][j - 1] == '#') {
-                                grid[i][j] = '^';
+                                grid[i][j] = '+';
+                                if (i - 1 < cols && (grid[i - 1][j] != '#')) {
+                                    grid[i][i - 1] = '^';
+                                    i = i - 1;
+                                }
                             }
                         }
 
                         if (grid[i][j] == '^') {
-                            if (i - 1 < 0) {
-                                grid[i][j] = 'X';
-                                return grid; // finished
-                            }
+//                            if (i - 1 < 0) {
+//                                grid[i][j] = 'X';
+//                                return grid; // finished
+//                            }
 
                             if (grid[i - 1][j] == '.' || grid[i - 1][j] == 'X') {
                                 grid[i - 1][j] = '^';
-                                grid[i][j] = 'X';
+                                grid[i][j] = '|';
                                 i = i - 1;
                             } else if (grid[i - 1][j] == '#') {
-                                grid[i][j] = '>';
+                                grid[i][j] = '+';
+                                if (j + 1 < cols && (grid[i][j + 1] != '#')) {
+                                    grid[i][j + 1] = '>';
+                                    j = j + 1;
+                                }
                             }
                         }
 
                         if (grid[i][j] == '>') {
-                            if (j + 1 >= grid.length) {
-                                grid[i][j] = 'X';
-                                return grid; // finished
-                            }
+//                            if (j + 1 >= grid.length) {
+//                                grid[i][j] = 'X';
+//                                return grid; // finished
+//                            }
 
                             if (grid[i][j + 1] == '.' || grid[i][j + 1] == 'X') {
                                 grid[i][j + 1] = '>';
-                                grid[i][j] = 'X';
+                                grid[i][j] = '-';
                                 j = j + 1;
                             } else if (grid[i][j + 1] == '#') {
-                                grid[i][j] = 'v';
+                                grid[i][j] = '+';
+                                if (i + 1 < rows && (grid[i + 1][j] != '#')) {
+                                    grid[i + 1][j] = 'v';
+                                    i = i + 1;
+                                }
                             }
                         }
 
                         if (grid[i][j] == 'v') {
-                            if (i + 1 >= grid.length) {
-                                grid[i][j] = 'X';
-                                return grid; // finished
-                            }
+//                            if (i + 1 >= grid.length) {
+//                                grid[i][j] = 'X';
+//                                return grid; // finished
+//                            }
 
                             if (grid[i + 1][j] == '.' || grid[i + 1][j] == 'X') {
                                 grid[i + 1][j] = 'v';
-                                grid[i][j] = 'X';
+                                grid[i][j] = '|';
                                 i = i + 1;
                             } else if (grid[i + 1][j] == '#') {
-                                grid[i][j] = '<';
+                                grid[i][j] = '+';
+                                if (j - 1 > 0 && (grid[i][j - 1] != '#')) {
+                                    grid[i][j - 1] = '<';
+                                    j = j - 1;
+                                }
                             }
                         }
                     }
