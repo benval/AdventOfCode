@@ -33,14 +33,25 @@ public class Day6 {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (grid[i][j] == startingDirection) {
-                    while (true) {
-                        if (grid[i][j] == '<') {
-//                            if (j - 1 < 0) {
-//                                grid[i][j] = 'X';
-//                                return grid; // finished
-//                            }
 
-                            if (grid[i][j - 1] == '.' || grid[i][j - 1] == 'X') {
+                    while (true) {
+                        // IF you put down a 0 you will now turn in another direction, if you have already been there then it is a valid 0
+
+                        if (grid[i][j] == '<') {
+                            if (grid[i][j - 1] == '|' || grid[i][j - 1] == '+') {
+                                if ((grid[i - 1][j - 1] == '+' || grid[i - 1][j - 1] == '|') && previousGridWins[i][j - 2] != '0') {
+                                    previousGridWins[i][j - 2] = '0';
+                                    grid[i][j - 1] = '-';
+                                    grid[i][j - 1] = '+';
+
+                                } else {
+
+                                }
+                                grid[i][j] = '-';
+                                grid[i][j - 1] = '+';
+                            }
+
+                            if (grid[i][j - 1] == '.') {
                                 grid[i][j - 1] = '<';
                                 grid[i][j] = '-';
                                 j = j - 1;
@@ -54,10 +65,12 @@ public class Day6 {
                         }
 
                         if (grid[i][j] == '^') {
-//                            if (i - 1 < 0) {
-//                                grid[i][j] = 'X';
-//                                return grid; // finished
-//                            }
+                            if (grid[i - 1][j] == '-') {
+                                grid[i - 1][j] = '+';
+                                if ((grid[i][j + 1] == '+' || grid[i][j + 1] == '|') && previousGridWins[i - 1][j] != '0') {
+                                    previousGridWins[i - 1][j] = '0';
+                                }
+                            }
 
                             if (grid[i - 1][j] == '.' || grid[i - 1][j] == 'X') {
                                 grid[i - 1][j] = '^';
@@ -73,10 +86,12 @@ public class Day6 {
                         }
 
                         if (grid[i][j] == '>') {
-//                            if (j + 1 >= grid.length) {
-//                                grid[i][j] = 'X';
-//                                return grid; // finished
-//                            }
+                            if (grid[i][j + 1] == '|') {
+                                grid[i][j + 1] = '+';
+                                if ((grid[i + 1][j] == '+' || grid[i + 1][j] == '|') && previousGridWins[i][j + 1] != '0') {
+                                    previousGridWins[i][j + 1] = '0';
+                                }
+                            }
 
                             if (grid[i][j + 1] == '.' || grid[i][j + 1] == 'X') {
                                 grid[i][j + 1] = '>';
@@ -92,10 +107,12 @@ public class Day6 {
                         }
 
                         if (grid[i][j] == 'v') {
-//                            if (i + 1 >= grid.length) {
-//                                grid[i][j] = 'X';
-//                                return grid; // finished
-//                            }
+                            if (grid[i + 1][j] == '-') {
+                                grid[i + 1][j] = '+';
+                                if ((grid[i][j - 1] == '+' || grid[i][j - 1] == '|') && previousGridWins[i + 1][j] != '0') {
+                                    previousGridWins[i + 1][j] = '0';
+                                }
+                            }
 
                             if (grid[i + 1][j] == '.' || grid[i + 1][j] == 'X') {
                                 grid[i + 1][j] = 'v';
