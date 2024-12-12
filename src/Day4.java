@@ -6,25 +6,10 @@ public class Day4 {
     public static void main(String[] args) {
         String word = "MAS";
 
-        Day4TestData data = new Day4TestData();
-        char[][] charGrid = convertToCharArray(data.task2);
+        char[][] charGrid = Util.convertStringToCharArray(Day4TestData.task2);
 
         int antallX = searchWord2(charGrid, word);
         System.out.println("Number of words: " + antallX);
-    }
-
-    private static char[][] convertToCharArray(String multilineString) {
-        String[] lines = multilineString.split("\n");
-        int numberOfRows = lines.length;
-        int numberOfCols = lines[0].length(); // Assumes all lines are of equal length
-
-        char[][] charArray = new char[numberOfRows][numberOfCols];
-
-        for (int i = 0; i < numberOfRows; i++) {
-            charArray[i] = lines[i].toCharArray();
-        }
-
-        return charArray;
     }
 
     public static int searchWord2(char[][] grid, String word) {

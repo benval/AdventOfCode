@@ -3,20 +3,25 @@ import java.util.regex.Pattern;
 
 public class Day6 {
     public static void main(String[] args) {
+        long startTime = System.nanoTime();
         int visitedPositions = 0;
 
 //        If there is something directly in front of you, turn right 90 degrees.
 //                Otherwise, take a step forward.
 
-        String inputTask1 = Day6TestData.inputTest;
+        String inputTask1 = Day6TestData.inputTask1;
 
-        char[][] charGrid = convertToCharArray(inputTask1);
+        char[][] charGrid = Util.convertStringToCharArray(inputTask1);
 
         char startingDirection = findStartingDirection(inputTask1);
-        playOutPath2(charGrid, startingDirection);
+        playOutPath(charGrid, startingDirection);
+//        playOutPath2(charGrid, startingDirection);
         visitedPositions = countDistinctMoves(charGrid);
 
         System.out.println("Sum of middle numbers from valid orders: " + visitedPositions);
+        long endTime = System.nanoTime();
+        long elapsedTime = (endTime - startTime) / 1_000_000; // Convert to milliseconds
+        System.out.println("Execution time: " + elapsedTime + " ms");
     }
 
     private static char findStartingDirection(String input) {
@@ -38,17 +43,22 @@ public class Day6 {
                         // IF you put down a 0 you will now turn in another direction, if you have already been there then it is a valid 0
 
                         if (grid[i][j] == '<') {
+                            if (j - 1 < 0) {
+                                break;
+                            }
                             if (grid[i][j - 1] == '|' || grid[i][j - 1] == '+') {
                                 if ((grid[i - 1][j - 1] == '+' || grid[i - 1][j - 1] == '|') && previousGridWins[i][j - 2] != '0') {
                                     previousGridWins[i][j - 2] = '0';
-                                    grid[i][j - 1] = '-';
+                                    grid[i][j] = '-';
                                     grid[i][j - 1] = '+';
-
+                                    grid[i - 1][j - 1] = '^';
+                                    i = i - 1;
+                                    j = j - 1;
                                 } else {
-
+                                    grid[i][j] = '-';
+                                    grid[i][j - 1] = '<';
+                                    j = j - 1;
                                 }
-                                grid[i][j] = '-';
-                                grid[i][j - 1] = '+';
                             }
 
                             if (grid[i][j - 1] == '.') {
@@ -66,9 +76,17 @@ public class Day6 {
 
                         if (grid[i][j] == '^') {
                             if (grid[i - 1][j] == '-') {
-                                grid[i - 1][j] = '+';
-                                if ((grid[i][j + 1] == '+' || grid[i][j + 1] == '|') && previousGridWins[i - 1][j] != '0') {
-                                    previousGridWins[i - 1][j] = '0';
+                                if ((grid[i - 1][j + 1] == '+' || grid[i - 1][j + 1] == '-') && previousGridWins[i - 2][j] != '0') {
+                                    previousGridWins[i - 2][j] = '0';
+                                    grid[i][j] = '|';
+                                    grid[i - 1][j] = '+';
+                                    grid[i - 1][j + 1] = '>';
+                                    i = i - 1;
+                                    j = j + 1;
+                                } else {
+                                    grid[i][j] = '|';
+                                    grid[i - 1][j] = '^';
+                                    i = i - 1;
                                 }
                             }
 
@@ -87,9 +105,17 @@ public class Day6 {
 
                         if (grid[i][j] == '>') {
                             if (grid[i][j + 1] == '|') {
-                                grid[i][j + 1] = '+';
-                                if ((grid[i + 1][j] == '+' || grid[i + 1][j] == '|') && previousGridWins[i][j + 1] != '0') {
-                                    previousGridWins[i][j + 1] = '0';
+                                if ((grid[i + 1][j + 1] == '+' || grid[i + 1][j + 1] == '|') && previousGridWins[i][j + 2] != '0') {
+                                    previousGridWins[i][j + 2] = '0';
+                                    grid[i][j] = '-';
+                                    grid[i][j + 1] = '+';
+                                    grid[i + 1][j + 1] = 'v';
+                                    i = i + 1;
+                                    j = j + 1;
+                                } else {
+                                    grid[i][j] = '-';
+                                    grid[i][j + 1] = '>';
+                                    j = j + 1;
                                 }
                             }
 
@@ -108,9 +134,17 @@ public class Day6 {
 
                         if (grid[i][j] == 'v') {
                             if (grid[i + 1][j] == '-') {
-                                grid[i + 1][j] = '+';
-                                if ((grid[i][j - 1] == '+' || grid[i][j - 1] == '|') && previousGridWins[i + 1][j] != '0') {
-                                    previousGridWins[i + 1][j] = '0';
+                                if ((grid[i + 1][j - 1] == '+' || grid[i + 1][j - 1] == '-') && previousGridWins[i + 2][j] != '0') {
+                                    previousGridWins[i + 2][j] = '0';
+                                    grid[i][j] = '|';
+                                    grid[i][j + 1] = '+';
+                                    grid[i - 1][j + 1] = '<';
+                                    i = i - 1;
+                                    j = j + 1;
+                                } else {
+                                    grid[i][j] = '|';
+                                    grid[i][j + 1] = 'v';
+                                    j = j + 1;
                                 }
                             }
 
@@ -205,20 +239,6 @@ public class Day6 {
             }
         }
         return grid;
-    }
-
-    public static char[][] convertToCharArray(String multilineString) {
-        String[] lines = multilineString.split("\n");
-        int numberOfRows = lines.length;
-        int numberOfCols = lines[0].length(); // Assumes all lines are of equal length
-
-        char[][] charArray = new char[numberOfRows][numberOfCols];
-
-        for (int i = 0; i < numberOfRows; i++) {
-            charArray[i] = lines[i].toCharArray();
-        }
-
-        return charArray;
     }
 
     private static int countDistinctMoves(char[][] input) {
