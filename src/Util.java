@@ -3,6 +3,8 @@ import java.util.regex.Pattern;
 
 public class Util {
 
+    // TODO skriv om day13 til å dele total antall på laveste score og se hvor nærmt man kommer?
+
     public static char[][] convertStringToCharArray(String multilineString) {
         String[] lines = multilineString.split("\n");
         int numberOfRows = lines.length;
