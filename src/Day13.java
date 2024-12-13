@@ -72,6 +72,7 @@ public class Day13 {
         return prizeCost;
     }
 
+    // Deprecated
     public static long getPrize(long ax, long ay, long bx, long by, long totalScoreX, long totalScoreY) {
         long cost = 0;
 

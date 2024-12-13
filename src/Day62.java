@@ -1,13 +1,18 @@
+import java.sql.Array;
+
 public class Day62 {
 
     public static void main(String[] args) {
         long startTime = System.nanoTime();
         int visitedPositions;
+        int numberOfLoopsToReachZero = 0;
 
         String inputTask1 = Day6TestData.inputTask1;
         String identifyStartingDirectionRegex = "[\\^<>v]";
 
         char[][] chars = Util.convertStringToCharArray(inputTask1);
+        char[][] copyChars = createCharCopy(chars);
+
 
         // find starting direction
         char startingDirection = Util.matchRegExToStringInput(identifyStartingDirectionRegex, inputTask1);
@@ -16,24 +21,46 @@ public class Day62 {
         StartPosition startPosition = Util.getStartPosition(chars, startingDirection);
 
         // find valid movement
-        performMove(chars, startPosition.posX(), startPosition.posY(), startingDirection);
+        int numberOfMoves = performMove(chars, startPosition.posX(), startPosition.posY(), startingDirection);
+
+        // this list is the options for where to place a 0 ?
         visitedPositions = Util.countOccurrencesOfChar(chars, 'X');
 
-        System.out.println("Sum of middle numbers from valid orders: " + visitedPositions);
+        System.out.println("Number of visited positions: " + visitedPositions);
+
+
+        for (int i = 0; i < chars.length; i++) {
+            for (int j = 0; j < chars[0].length; j++) {
+                if (chars[i][j] == 'X' && copyChars[i][j] != startingDirection) {
+                    char[][] copyOfCopy = createCharCopy(copyChars);
+                    copyOfCopy[i][j] = '#';
+                    if (performMove2(copyOfCopy, startPosition.posX(), startPosition.posY(), startingDirection, numberOfMoves*2)) {
+                        numberOfLoopsToReachZero++;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Number of different positions that creates a loop: " + numberOfLoopsToReachZero);
         long endTime = System.nanoTime();
         long elapsedTime = (endTime - startTime) / 1_000_000; // Convert to milliseconds
         System.out.println("Execution time: " + elapsedTime + " ms");
     }
 
-    private static void performMove2(char[][] grid, int row, int col, char startingDirection) {
-        char[][] possibleObstructions = new char[grid.length][grid[0].length];
+    private static char[][] createCharCopy(char[][] original) {
+        char[][] copyChars = new char[original.length][original[0].length];
 
-        // Kan man avgjøre dette uten å måtte sjekke alle mulige steder å putte ned en 0
-        // Type test å sette en 0 på 0,0 og se om du havner i loop -> nei!
-        // Type test å sette en 0 på 1,0 og se om du havner i loop -> nei!, etc?
-        // Må være en bedre måte å avgjøre om man kan opprette en loop?
+        for (int i = 0; i < original.length; i++) {
+            // Copy each inner array
+            copyChars[i] = new char[original[i].length];
+            System.arraycopy(original[i], 0, copyChars[i], 0, original[i].length);
+        }
 
-        while (true) {
+        return copyChars;
+    }
+
+    private static boolean performMove2(char[][] grid, int row, int col, char startingDirection, int moves) {
+        while (moves > 0) {
             int startPosX = row;
             int startPosY = col;
 
@@ -53,11 +80,12 @@ public class Day62 {
 
             grid[startPosX][startPosY] = 'X';
             if (Util.isTileOutOfRange(grid, row, col)) {
-                break;
+                return false;
             }
 
             if (isTileValid(grid, row, col)) {
                 grid[row][col] = startingDirection;
+                moves--;
             } else {
                 // change direction
                 startingDirection = startingDirection == '^' ? '>' : startingDirection == '>' ? 'v' : startingDirection == 'v' ? '<' : '^';
@@ -66,10 +94,13 @@ public class Day62 {
                 col = startPosY;
             }
         }
+        return true;
     }
 
 
-    private static void performMove(char[][] grid, int row, int col, char startingDirection) {
+    private static int performMove(char[][] grid, int row, int col, char startingDirection) {
+        int moves = 0;
+
         while (true) {
             int startPosX = row;
             int startPosY = col;
@@ -90,11 +121,12 @@ public class Day62 {
 
             grid[startPosX][startPosY] = 'X';
             if (Util.isTileOutOfRange(grid, row, col)) {
-                break;
+                return moves;
             }
 
             if (isTileValid(grid, row, col)) {
                 grid[row][col] = startingDirection;
+                moves++;
             } else {
                 // change direction
                 startingDirection = startingDirection == '^' ? '>' : startingDirection == '>' ? 'v' : startingDirection == 'v' ? '<' : '^';
