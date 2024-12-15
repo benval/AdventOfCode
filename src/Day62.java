@@ -1,5 +1,3 @@
-import java.sql.Array;
-
 public class Day62 {
 
     public static void main(String[] args) {
@@ -34,7 +32,7 @@ public class Day62 {
                 if (chars[i][j] == 'X' && copyChars[i][j] != startingDirection) {
                     char[][] copyOfCopy = createCharCopy(copyChars);
                     copyOfCopy[i][j] = '#';
-                    if (performMove2(copyOfCopy, startPosition.posX(), startPosition.posY(), startingDirection, numberOfMoves*2)) {
+                    if (performMove2(copyOfCopy, startPosition.posX(), startPosition.posY(), startingDirection, numberOfMoves * 2)) {
                         numberOfLoopsToReachZero++;
                     }
                 }
@@ -64,19 +62,9 @@ public class Day62 {
             int startPosX = row;
             int startPosY = col;
 
-            if (startingDirection == '^') {
-                // we check up
-                row = row - 1;
-            } else if (startingDirection == '<') {
-                // we check left
-                col = col - 1;
-            } else if (startingDirection == '>') {
-                // we check right
-                col = col + 1;
-            } else if (startingDirection == 'v') {
-                // we check down
-                row = row + 1;
-            }
+            int[] updated = Util.updateGrid(row, col, startingDirection);
+            row = updated[0];
+            col = updated[1];
 
             grid[startPosX][startPosY] = 'X';
             if (Util.isTileOutOfRange(grid, row, col)) {
@@ -105,19 +93,9 @@ public class Day62 {
             int startPosX = row;
             int startPosY = col;
 
-            if (startingDirection == '^') {
-                // we check up
-                row = row - 1;
-            } else if (startingDirection == '<') {
-                // we check left
-                col = col - 1;
-            } else if (startingDirection == '>') {
-                // we check right
-                col = col + 1;
-            } else if (startingDirection == 'v') {
-                // we check down
-                row = row + 1;
-            }
+            int[] updated = Util.updateGrid(row, col, startingDirection);
+            row = updated[0];
+            col = updated[1];
 
             grid[startPosX][startPosY] = 'X';
             if (Util.isTileOutOfRange(grid, row, col)) {

@@ -93,15 +93,9 @@ public class Day152 {
 
         grid[row][col] = '.';
 
-        if (startingDirection == '^') {
-            row = row - 1;
-        } else if (startingDirection == '<') {
-            col = col - 1;
-        } else if (startingDirection == '>') {
-            col = col + 1;
-        } else if (startingDirection == 'v') {
-            row = row + 1;
-        }
+        int[] updated = Util.updateGrid(row, col, startingDirection);
+        row = updated[0];
+        col = updated[1];
 
         if (grid[row][col] != '.') {
             if (startingDirection == '^' || startingDirection == 'v') {
@@ -152,15 +146,10 @@ public class Day152 {
 
     private static void incrementBoxess(char[][] grid, int row, int col, char startingDirection, char character) {
         grid[row][col] = '.';
-        if (startingDirection == '^') {
-            row = row - 1;
-        } else if (startingDirection == 'v') {
-            row = row + 1;
-        } else if (startingDirection == '<') {
-            col = col - 1;
-        } else if (startingDirection == '>') {
-            col = col + 1;
-        }
+
+        int[] updated = Util.updateGrid(row, col, startingDirection);
+        row = updated[0];
+        col = updated[1];
 
         grid[row][col] = character;
     }
@@ -225,7 +214,6 @@ public class Day152 {
         char character = grid[row][col];
         incrementBoxes.putIfAbsent(new Coordinate(row, col), character);
         return canDoAColumnMove(grid, row, col, startingDirection);
-
     }
 
     private static String findBoard(String input) {

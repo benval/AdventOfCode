@@ -77,6 +77,19 @@ public class Util {
         return matcher.find() ? matcher.group().charAt(0) : ' ';
     }
 
+    static int[] updateGrid(int row, int col, char startingDirection) {
+        if (startingDirection == '^') {
+            row = row - 1;
+        } else if (startingDirection == '<') {
+            col = col - 1;
+        } else if (startingDirection == '>') {
+            col = col + 1;
+        } else if (startingDirection == 'v') {
+            row = row + 1;
+        }
+        return new int[]{row, col};
+    }
+
 }
 
 record StartPosition(int posX, int posY) {

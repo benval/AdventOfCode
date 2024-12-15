@@ -48,19 +48,9 @@ public class Day15 {
             return;
         }
 
-        if (startingDirection == '^') {
-            // we check up
-            row = row - 1;
-        } else if (startingDirection == '<') {
-            // we check left
-            col = col - 1;
-        } else if (startingDirection == '>') {
-            // we check right
-            col = col + 1;
-        } else if (startingDirection == 'v') {
-            // we check down
-            row = row + 1;
-        }
+        int[] updated = Util.updateGrid(row, col, startingDirection);
+        row = updated[0];
+        col = updated[1];
 
         grid[startPosX][startPosY] = '.';
 
@@ -77,19 +67,9 @@ public class Day15 {
     }
 
     private static void performOMove(char[][] grid, int row, int col, char startingDirection) {
-        if (startingDirection == '^') {
-            // we check up
-            row = row - 1;
-        } else if (startingDirection == '<') {
-            // we check left
-            col = col - 1;
-        } else if (startingDirection == '>') {
-            // we check right
-            col = col + 1;
-        } else if (startingDirection == 'v') {
-            // we check down
-            row = row + 1;
-        }
+        int[] updated = Util.updateGrid(row, col, startingDirection);
+        row = updated[0];
+        col = updated[1];
 
         if (grid[row][col] == '.') {
             grid[row][col] = 'O';
@@ -99,19 +79,9 @@ public class Day15 {
     }
 
     private static boolean canMove(char[][] grid, int row, int col, char startingDirection) {
-        if (startingDirection == '^') {
-            // we check up
-            row = row - 1;
-        } else if (startingDirection == '<') {
-            // we check left
-            col = col - 1;
-        } else if (startingDirection == '>') {
-            // we check right
-            col = col + 1;
-        } else if (startingDirection == 'v') {
-            // we check down
-            row = row + 1;
-        }
+        int[] updated = Util.updateGrid(row, col, startingDirection);
+        row = updated[0];
+        col = updated[1];
 
         if (grid[row][col] == '#') {
             return false;
