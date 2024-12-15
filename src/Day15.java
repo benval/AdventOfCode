@@ -17,14 +17,10 @@ public class Day15 {
         String board = findBoard(inputString);
         char[][] grid = Util.convertStringToCharArray(board);
 
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j] == '@') {
-                    startRow = i;
-                    startCol = j;
-                }
-            }
-        }
+        Coordinate startCoordinate = Day152.findStartCoordinate(grid);
+        assert startCoordinate != null;
+        startCol = startCoordinate.col;
+        startRow = startCoordinate.row;
 
         for (int i = 0; i < actionSequence.length(); i++) {
             char action = actionSequence.charAt(i);

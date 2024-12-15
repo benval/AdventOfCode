@@ -7,13 +7,12 @@ public class Day152 {
     private static int startRow = 0;
     private static int startCol = 0;
 
-    private static HashMap<Coordinate, Character> incrementBoxes = new HashMap<>();
+    private static final HashMap<Coordinate, Character> incrementBoxes = new HashMap<>();
 
     public static void main(String[] args) {
-        int sumOfAllBoxesGPSCoordiates = 0;
+        int sumOfAllBoxesGPSCoordiates;
 
         String inputString = Day15TestData.inputData;
-
 
         String actionSequence = findActionSequence(inputString);
 
@@ -22,20 +21,19 @@ public class Day152 {
 
         char[][] grid = Util.convertStringToCharArray(newBoard);
 
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j] == '@') {
-                    startRow = i;
-                    startCol = j;
-                }
-            }
-        }
+        Coordinate startCoordinate = findStartCoordinate(grid);
+        assert startCoordinate != null;
+        startCol = startCoordinate.col;
+        startRow = startCoordinate.row;
 
-        for (int i = 0; i < actionSequence.length(); i++) {
-            char action = actionSequence.charAt(i);
-            performMove(grid, startRow, startCol, action);
-        }
+        performActions(grid, actionSequence);
+        sumOfAllBoxesGPSCoordiates = calculateSumOfAllBoxesGPSCoordiates(grid);
 
+        System.out.println("Safety factor: " + sumOfAllBoxesGPSCoordiates);
+    }
+
+    private static int calculateSumOfAllBoxesGPSCoordiates(char[][] grid) {
+        int sumOfAllBoxesGPSCoordiates = 0;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
                 if (grid[i][j] == '[') {
@@ -43,8 +41,25 @@ public class Day152 {
                 }
             }
         }
+        return sumOfAllBoxesGPSCoordiates;
+    }
 
-        System.out.println("Safety factor: " + sumOfAllBoxesGPSCoordiates);
+    private static void performActions(char[][] grid, String actionSequence) {
+        for (int i = 0; i < actionSequence.length(); i++) {
+            char action = actionSequence.charAt(i);
+            performMove(grid, startRow, startCol, action);
+        }
+    }
+
+    static Coordinate findStartCoordinate(char[][] grid) {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == '@') {
+                    return new Coordinate(i, j);
+                }
+            }
+        }
+        return null;
     }
 
     private static String createNewBoard(String board) {
@@ -72,49 +87,36 @@ public class Day152 {
     }
 
     private static void performMove(char[][] grid, int row, int col, char startingDirection) {
-        int startPosX = row;
-        int startPosY = col;
-
         if (!canMove(grid, row, col, startingDirection)) {
             return;
         }
 
+        grid[row][col] = '.';
+
         if (startingDirection == '^') {
-            // we check up
             row = row - 1;
         } else if (startingDirection == '<') {
-            // we check left
             col = col - 1;
         } else if (startingDirection == '>') {
-            // we check right
             col = col + 1;
         } else if (startingDirection == 'v') {
-            // we check down
             row = row + 1;
         }
 
-        grid[startPosX][startPosY] = '.';
-
-        if (grid[row][col] == '.') {
-            grid[row][col] = '@';
-        } else {
-            if (startingDirection == '<' || startingDirection == '>') {
-                performComplexBoxMove(grid, startingDirection);
-                grid[row][col] = '@';
-            } else {
+        if (grid[row][col] != '.') {
+            if (startingDirection == '^' || startingDirection == 'v') {
                 if (grid[row][col] == '[') {
                     grid[row][col + 1] = '.';
                 } else {
                     grid[row][col - 1] = '.';
                 }
-                performComplexBoxMove(grid, startingDirection);
-                grid[row][col] = '@';
             }
+            performComplexBoxMove(grid, startingDirection);
         }
 
+        grid[row][col] = '@';
         startRow = row;
         startCol = col;
-
     }
 
     private static void performComplexBoxMove(char[][] grid, char startingDirection) {
@@ -122,28 +124,21 @@ public class Day152 {
         List<Map.Entry<Coordinate, Character>> sortedEntries = new ArrayList<>(incrementBoxes.entrySet());
 
         // Sort the entries based on the startingDirection
-        Comparator<Map.Entry<Coordinate, Character>> comparator;
-
-        switch (startingDirection) {
-            case '^': // Ascending order of row, then ascending order of col
-                comparator = Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> entry.getKey().row)
-                        .thenComparingInt(entry -> entry.getKey().col);
-                break;
-            case 'v': // Descending order of row, then ascending order of col
-                comparator = Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> -entry.getKey().row)
-                        .thenComparingInt(entry -> entry.getKey().col);
-                break;
-            case '<': // Ascending order of col, then ascending order of row
-                comparator = Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> entry.getKey().col)
-                        .thenComparingInt(entry -> entry.getKey().row);
-                break;
-            case '>': // Descending order of col, then ascending order of row
-                comparator = Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> -entry.getKey().col)
-                        .thenComparingInt(entry -> entry.getKey().row);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid direction: " + startingDirection);
-        }
+        Comparator<Map.Entry<Coordinate, Character>> comparator = switch (startingDirection) {
+            case '^' -> // Ascending order of row, then ascending order of col
+                    Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> entry.getKey().row)
+                            .thenComparingInt(entry -> entry.getKey().col);
+            case 'v' -> // Descending order of row, then ascending order of col
+                    Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> -entry.getKey().row)
+                            .thenComparingInt(entry -> entry.getKey().col);
+            case '<' -> // Ascending order of col, then ascending order of row
+                    Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> entry.getKey().col)
+                            .thenComparingInt(entry -> entry.getKey().row);
+            case '>' -> // Descending order of col, then ascending order of row
+                    Comparator.comparingInt((Map.Entry<Coordinate, Character> entry) -> -entry.getKey().col)
+                            .thenComparingInt(entry -> entry.getKey().row);
+            default -> throw new IllegalArgumentException("Invalid direction: " + startingDirection);
+        };
 
         sortedEntries.sort(comparator);
         sortedEntries.forEach(entry -> {
@@ -171,22 +166,20 @@ public class Day152 {
     }
 
     private static boolean canMove(char[][] grid, int row, int col, char startingDirection) {
+        boolean canMove;
+
         if (startingDirection == '^' || startingDirection == 'v') {
-            boolean b = canDoComplexMove2(grid, row, col, startingDirection);
-            if (!b) {
-                incrementBoxes.clear();
-            }
-            return b;
+            canMove = canDoARowMove(grid, row, col, startingDirection);
         } else {
-            boolean b = canDoSimpleMove2(grid, row, col, startingDirection);
-            if (!b) {
-                incrementBoxes.clear();
-            }
-            return b;
+            canMove = canDoAColumnMove(grid, row, col, startingDirection);
         }
+        if (!canMove) {
+            incrementBoxes.clear();
+        }
+        return canMove;
     }
 
-    private static boolean canDoComplexMove2(char[][] grid, int row, int col, char startingDirection) {
+    private static boolean canDoARowMove(char[][] grid, int row, int col, char startingDirection) {
         if (startingDirection == '^') {
             row = row - 1;
         } else if (startingDirection == 'v') {
@@ -201,22 +194,20 @@ public class Day152 {
             return false;
         }
 
+        int nextCol;
         if (grid[row][col] == '[') {
-            char character = grid[row][col];
-            incrementBoxes.putIfAbsent(new Coordinate(row, col), character);
-            char character2 = grid[row][col + 1];
-            incrementBoxes.compute(new Coordinate(row, col + 1), (k, v) -> character2);
-            return canDoComplexMove2(grid, row, col, startingDirection) && canDoComplexMove2(grid, row, col + 1, startingDirection);
+            nextCol = col + 1;
         } else {
-            char character = grid[row][col];
-            incrementBoxes.compute(new Coordinate(row, col), (k, v) -> character);
-            char character2 = grid[row][col - 1];
-            incrementBoxes.compute(new Coordinate(row, col - 1), (k, v) -> character2);
-            return canDoComplexMove2(grid, row, col, startingDirection) && canDoComplexMove2(grid, row, col - 1, startingDirection);
+            nextCol = col - 1;
         }
+        char character = grid[row][col];
+        char character2 = grid[row][nextCol];
+        incrementBoxes.putIfAbsent(new Coordinate(row, col), character);
+        incrementBoxes.putIfAbsent(new Coordinate(row, nextCol), character2);
+        return canDoARowMove(grid, row, col, startingDirection) && canDoARowMove(grid, row, nextCol, startingDirection);
     }
 
-    private static boolean canDoSimpleMove2(char[][] grid, int row, int col, char startingDirection) {
+    private static boolean canDoAColumnMove(char[][] grid, int row, int col, char startingDirection) {
         if (startingDirection == '<') {
             col = col - 1;
         } else if (startingDirection == '>') {
@@ -233,46 +224,20 @@ public class Day152 {
 
         char character = grid[row][col];
         incrementBoxes.putIfAbsent(new Coordinate(row, col), character);
-        return canDoSimpleMove2(grid, row, col, startingDirection);
+        return canDoAColumnMove(grid, row, col, startingDirection);
 
     }
 
     private static String findBoard(String input) {
         Pattern pattern = Pattern.compile("[\\^<>v]");
         Matcher matcher = pattern.matcher(input);
-
         return matcher.find() ? input.substring(0, input.indexOf(matcher.group())) : "";
     }
 
     private static String findActionSequence(String input) {
         Pattern pattern = Pattern.compile("[\\^<>v]");
         Matcher matcher = pattern.matcher(input);
-
         String string = matcher.find() ? input.substring(input.indexOf(matcher.group())) : "";
-
         return string.replace("\n", "");
-    }
-
-}
-
-class Coordinate {
-    int row, col;
-
-    public Coordinate(int row, int col) {
-        this.row = row;
-        this.col = col;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Coordinate that = (Coordinate) o;
-        return row == that.row && col == that.col;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
     }
 }
