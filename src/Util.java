@@ -13,7 +13,8 @@ public class Util {
 
         char[][] charArray = new char[numberOfRows][numberOfCols];
 
-        for (int i = 0; i < numberOfRows - 1; i++) {
+//        for (int i = 0; i < numberOfRows - 1; i++) {
+        for (int i = 0; i < numberOfRows; i++) {
             charArray[i] = lines[i].toCharArray();
         }
 
