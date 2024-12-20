@@ -12,7 +12,7 @@ public class Day17TestData {
             "\n" +
             "Program: 0,3,5,4,3,0";
 
-    public static String inputData = "Register A: 3066245337211418\n" +
+    public static String inputData = "Register A: 47910079996090\n" +
             "Register B: 0\n" +
             "Register C: 0\n" +
             "\n" +

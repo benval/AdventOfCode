@@ -30,7 +30,7 @@ public class Day17 {
             registerB = initialB;
             registerC = initialC;
 
-            iteration += 32L;
+            iteration++;
             registerA = initialA + iteration;
 
             runOpcode(program, output);
@@ -40,10 +40,14 @@ public class Day17 {
             System.out.println("Attempted output: " + output);
 
             long finalA2 = initialA + iteration;
-            if (output.substring(output.length()-17).equals(part2.substring(part2.length()-17))) {
-                System.out.println("SJEKK OPP I: " + finalA2);
+            if (finalA2 > 999729324600000L) {
+                System.out.println("Missed");
                 break;
             }
+//            if (output.substring(output.length()-27).equals(part2.substring(part2.length()-27))) {
+//                System.out.println("SJEKK OPP I: " + finalA2);
+//                break;
+//            }
 
             System.out.println("Current register A iteration : " + finalA2);
         }
@@ -54,6 +58,7 @@ public class Day17 {
 
     // answer is between 9997337967362 and 999729324600000
 //    9997337967362
+//    47906345178982
 //    99973649857688
 //    999729324600000
     // that is still 989732031354000 values to calculate
