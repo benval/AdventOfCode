@@ -40,13 +40,50 @@ public class Day20 {
         Long newLength = costToPosition.get(new StartPosition(endPosition.posX(), endPosition.posY()));
         System.out.println("ShortestPath: " + newLength);
 
-        long numberOfCheats = numberOfPotentialCheats(true);
-        numberOfCheats += numberOfPotentialCheats(false);
+        long numberOfCheats = numberOfPotentialCheats2();
+
+//        long numberOfCheats = numberOfPotentialCheats(true);
+//        numberOfCheats += numberOfPotentialCheats(false);
 
         System.out.println("Antall cheats: " + numberOfCheats);
 
         // calculate paths with cheat
 
+    }
+
+    private static long numberOfPotentialCheats2() {
+        AtomicLong numberOfCheats = new AtomicLong();
+
+        List<Map.Entry<StartPosition, Long>> sortedEntries = new ArrayList<>(costToPosition.entrySet());
+        List<Map.Entry<StartPosition, Long>> norrmalEntries = new ArrayList<>(costToPosition.entrySet());
+
+        Comparator<Map.Entry<StartPosition, Long>> comparator = Comparator.comparingLong((Map.Entry<StartPosition, Long> entry) -> -entry.getKey().posX())
+                .thenComparingInt(entry -> entry.getKey().posY());
+
+        sortedEntries.sort(comparator);
+        sortedEntries.forEach(entry -> {
+
+            StartPosition k = entry.getKey();
+            long value = entry.getValue();
+
+            for (Map.Entry<StartPosition, Long> norrmalEntry : norrmalEntries) {
+
+                StartPosition key = norrmalEntry.getKey();
+                long nValue = norrmalEntry.getValue();
+
+                int xDistance = Math.abs(k.posX() - key.posX());
+                int yDistance = Math.abs(k.posY() - key.posY());
+                int totalDistance = xDistance + yDistance;
+
+                long savedSeconds = Math.abs(value - nValue);
+
+                if (value > nValue && totalDistance <= 20 && totalDistance > 0 && savedSeconds - totalDistance >= 100) {
+                    numberOfCheats.getAndIncrement();
+                }
+            }
+        });
+
+        return numberOfCheats.get();
     }
 
     private static long numberOfPotentialCheats(boolean sortByRows) {
